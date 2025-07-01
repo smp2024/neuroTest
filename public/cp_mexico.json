@@ -1,0 +1,14 @@
+[
+  {
+    "codigo_postal": "01120",
+    "estado": "Ciudad de México",
+    "municipio": "Álvaro Obregón",
+    "colonias": "Colonia Las Águilas|Colonia Merced Gómez|Colonia Olivar de los Padres"
+  },
+  {
+    "codigo_postal": "03000",
+    "estado": "Ciudad de México",
+    "municipio": "Benito Juárez",
+    "colonias": "Colonia Del Valle|Colonia Narvarte|Colonia Álamos"
+  }
+]

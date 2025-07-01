@@ -1,0 +1,219 @@
+@extends('welcome')
+
+@section('content')
+<div class="container mt-4 mb-5">
+    <h3>Agregar Paciente</h3>
+    <form  method="POST" action="{{ route('store') }}" enctype="multipart/form-data" id="form_patient">
+        {{-- CSRF Token --}}
+        @csrf
+
+        {{-- DATOS DEL PACIENTE --}}
+        <div class="card mb-4 p-4">
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label>Nombre</label>
+                    <input type="text" name="name" class="form-control" >
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Apellido Paterno</label>
+                    <input type="text" name="paternal_surname" class="form-control" >
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Apellido Materno</label>
+                    <input type="text" name="maternal_surname" class="form-control" >
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" >
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Teléfono</label>
+                    <input type="text" name="mobile" class="form-control" >
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Fecha de nacimiento</label>
+                    <input type="date" name="birth_date" class="form-control" >
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Género</label><br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" value="Male" > Masculino
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" value="Female"> Femenino
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Nivel Escolar</label>
+                    <input type="text" name="education" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Foto</label>
+                    <input type="file" name="avatar" class="form-control-file">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label>Dirección (Calle)</label>
+                    <input type="text" name="address" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Código Postal</label>
+                    <div class="input-group">
+                        <input type="text" id="postal_code" name="postal_code" class="form-control" >
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-primary" id="validate_cp">Validar C.P.</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Estado</label>
+                    <select name="state" id="state" class="form-control" ></select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Ciudad</label>
+                    <select name="city" id="city" class="form-control" ></select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Colonia</label>
+                    <select name="colony" id="colony" class="form-control" ></select>
+                </div>
+            </div>
+
+        </div>
+
+        {{-- FAMILIARES --}}
+        <h4>Responsable / Familiares</h4>
+        <div id="relatives-container">
+            <div class="card p-3 mb-3 relative-row">
+                <div class="form-row">
+                    <div class="form-group col-md-2">
+                        <label>Tipo de persona</label>
+                        <select name="relatives[0][type_person]" class="form-control type-person" >
+                            <option value="0">Titular</option>
+                            <option value="1">Familiar</option>
+                            <option value="2">Especialista</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>Parentezco</label>
+                        <select name="relatives[0][relationship]" class="form-control" >
+                            <option value="Padre">Padre</option>
+                            <option value="Madre">Madre</option>
+                            <option value="Hermano">Hermano</option>
+                            <option value="Tío">Tío</option>
+                            <option value="Abuelo">Abuelo</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Nombre(s)</label>
+                        <input type="text" name="relatives[0][name]" class="form-control" >
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Apellido(s)</label>
+                        <input type="text" name="relatives[0][surname]" class="form-control" >
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>Teléfono(celular)</label>
+                        <input type="text" name="relatives[0][mobile]" class="form-control" >
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Email</label>
+                        <input type="email" name="relatives[0][email]" class="form-control" >
+                    </div>
+                    <div class="form-group col-md-4 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm remove-relative d-none">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" id="add-relative" class="btn btn-outline-primary mb-3">+ Agregar Familiar</button>
+        <br>
+        {{-- <button type="submit" class="btn btn-success">Guardar</button> --}}
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmModal">
+            Siguiente
+        </button>
+        <!-- Modal de confirmación -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar envío</h5>
+                </div>
+                <div class="modal-body">
+                    Se enviará un link del cuestionario a los familiares registrados. ¿Deseas continuar?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success sumit-form">Aceptar y Continuar</button>
+                </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@endsection
+
+@section('scripts')
+<script>
+let relativeIndex = 1;
+
+$('#add-relative').click(function() {
+    const newRelative = $('.relative-row:first').clone();
+    newRelative.find('input, select').each(function() {
+        const name = $(this).attr('name');
+        const newName = name.replace(/\[0\]/, `[${relativeIndex}]`);
+        $(this).attr('name', newName).val('');
+    });
+    newRelative.find('.remove-relative').removeClass('d-none');
+    $('#relatives-container').append(newRelative);
+    relativeIndex++;
+});
+
+$(document).on('click', '.remove-relative', function() {
+    $(this).closest('.relative-row').remove();
+});
+$(document).on('click', '.submit-form', function() {
+    $('#form_patient').submit();
+});
+
+// VALIDAR CP CON AJAX
+$('#validate_cp').click(function() {
+    let cp = $('#postal_code').val();
+    $.ajax({
+        url: '{{ url("/cp/validar") }}',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            cp: cp
+        },
+        success: function(data) {
+            $('#state').html(`<option value="${data.estado}">${data.estado}</option>`);
+            $('#city').html(`<option value="${data.municipio}">${data.municipio}</option>`);
+            $('#colony').html('');
+            data.colonias.forEach(colonia => {
+                $('#colony').append(`<option value="${colonia}">${colonia}</option>`);
+            });
+        },
+        error: function() {
+            alert('Código postal no encontrado.');
+        }
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+
+    form.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            console.log('Enter key pressed, preventing default form submission.');
+            e.preventDefault();
+            return false;
+        }
+    });
+});
+</script>
+@endsection
