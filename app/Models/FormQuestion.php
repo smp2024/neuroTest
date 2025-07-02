@@ -14,4 +14,14 @@ class FormQuestion extends Model
     {
         return $this->belongsTo(Form::class);
     }
+    public function answers()
+    {
+        return $this->hasMany(FormPatient::class);
+    }
+    public function getOptionsAttribute($value)
+    {
+        return json_decode($value, true);
+    }
+
+
 }

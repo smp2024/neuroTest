@@ -35,7 +35,7 @@ class FormLink extends Model
 
     public function person()
     {
-        return $this->belongsTo(PatientPerson::class, 'patient_person_id');
+        return $this->belongsTo(PatientPerson::class, 'patient_id', 'patient_id');
     }
 
     public function form()

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\PatientController;
 use App\Http\Controllers\FormController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FormQuestionController;
+use App\Http\Controllers\FormResponseController;
 
 Route::get('/', function () {
     return view('patients.create');
@@ -34,3 +35,7 @@ Route::prefix('admin/forms')->name('forms.')->group(function () {
 
 Route::get('/formulario/{token}/familiares', [FormController::class, 'formFam'])->name('form.familiares');
 Route::post('/formulario/{token}/familiares', [FormController::class, 'storeRespuestasFamiliares'])->name('familiares.store');
+
+
+Route::get('/admin/respuestas', [FormResponseController::class, 'index'])->name('respuestas.index');
+Route::get('/admin/respuestas/{formLink}', [FormResponseController::class, 'show'])->name('respuestas.show');
