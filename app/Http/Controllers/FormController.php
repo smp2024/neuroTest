@@ -96,7 +96,7 @@ class FormController extends Controller
             'group' => 'required|in:1,2,3',
         ]);
 
-        Form::create([
+        $form =  Form::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name . '-' . uniqid()),
             'description' => $request->description,
@@ -104,7 +104,9 @@ class FormController extends Controller
             'group' => $request->group,
         ]);
 
-        return redirect()->route('forms.index')->with('success', 'Formulario creado');
+        // return redirect()->route('forms.index')->with('success', 'Formulario creado');
+
+        return redirect()->route('forms.questions.create', ['form' => $form->id])->with('success', 'Formulario creado con éxito');
     }
 
     public function edit(Form $form)
@@ -158,13 +160,13 @@ class FormController extends Controller
         $link = FormLink::where('token', $token)->firstOrFail();
         $questions = formQuestion::all();
 
-        // if ($link->used) {
-        //     abort(403, 'Este formulario ya fue contestado.');
-        // }
+        if ($link->used) {
+            abort(403, 'Este formulario ya fue contestado.');
+        }
 
-        // if (now()->greaterThan($link->expires_at)) {
-        //     abort(403, 'El formulario ha expirado.');
-        // }
+        if (now()->greaterThan($link->expires_at)) {
+            abort(403, 'El formulario ha expirado.');
+        }
         $data = [
             'token' => $token,
             'patient' => $link->patient,
@@ -180,9 +182,9 @@ class FormController extends Controller
     {
         // dd($request->all());
         $link = FormLink::where('token', $token)->first();
-        // if ($link->used_at || now()->greaterThan($link->expires_at)) {
-        //     return abort(403, 'No puedes enviar este formulario.');
-        // }
+        if ($link->used_at || now()->greaterThan($link->expires_at)) {
+            return abort(403, 'No puedes enviar este formulario.');
+        }
         $resp = $request->answers;
         if (empty($resp)) {
             return redirect()->back()->with('error', 'No se han enviado respuestas.');
@@ -204,7 +206,7 @@ class FormController extends Controller
             $fp->patient_person_id = $link->relative_id;
             $fp->question_id = $question_id;
             $fp->answered = $answer;
-            $fp->comments = $request->comments;
+            $fp->comments = $request->{'comment_' . $question_id} ?? null;
             $fp->save();
         }
         $link->used_at = true;

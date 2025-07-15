@@ -4,6 +4,18 @@
 <div class="container">
     <h4>Agregar Pregunta a {{ $form->name }}</h4>
     <form action="{{ route('forms.questions.store', $form) }}" method="POST">@csrf
+        <div class="form-group">
+            <label>Categoría:</label>
+            <select name="category" class="form-control" required>
+                <option value="">Seleccione una categoría</option>
+                <option value="alimentacion">Alimentación</option>
+                <option value="habla">Habla</option>
+                <option value="cognitiva">Cognitiva</option>
+                <option value="motora">Motora</option>
+                <option value="emocional">Emocional</option>
+                <option value="social">Social</option>
+            </select>
+        </div>
 
         <div class="form-group">
             <label>Texto de la pregunta:</label>
@@ -24,12 +36,12 @@
 
         <div class="form-group">
             <label>Opciones (solo si aplica, separadas por coma):</label>
-            <input type="text" name="options" class="form-control">
+            <input type="text" name="options" class="form-control" placeholder="Nunca, Poco, Algo, Mucho">
         </div>
 
         <div class="form-group">
             <label>Orden:</label>
-            <input type="number" name="order" class="form-control" value="0">
+            <input type="number" name="order" min="1" class="form-control" value="1" required>
         </div>
 
         <div class="form-group form-check">

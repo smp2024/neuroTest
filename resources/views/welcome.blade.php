@@ -46,8 +46,11 @@
                         </button>
                         <div class="collapse navbar-collapse" id="navbarNav">
                             <ul class="navbar-nav">
-                                <li class="nav-item {{ Route::currentRouteName() == '/' ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ url('/admin/respuestas') }}">Respuestas <span class="sr-only">(current)</span></a>
+                                <li class="nav-item {{ Route::currentRouteName() == 'respuestas.index' ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ url('/respuestas') }}">Respuestas <span class="sr-only">(current)</span></a>
+                                </li>
+                                  <li class="nav-item {{ Route::currentRouteName() == 'forms.index' ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ url('/forms') }}">Formularios <span class="sr-only">(current)</span></a>
                                 </li>
                             </ul>
                         </div>

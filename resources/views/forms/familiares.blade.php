@@ -27,7 +27,7 @@
                 </div>
                 <div class="form-group">
                     <label for="comments">Comentarios adicionales:</label>
-                    <textarea class="form-control" id="comments" name="comments[{{ $q->id }}]" rows="3"></textarea>
+                    <textarea class="form-control" id="comment_{{ $q->id }}" name="comment_{{ $q->id }}" rows="3"></textarea>
                 </div>
             </div>
         @endforeach

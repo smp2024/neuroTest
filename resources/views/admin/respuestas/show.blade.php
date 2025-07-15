@@ -7,6 +7,7 @@
     <table class="table">
         <thead>
             <tr>
+                <th>Categoria</th>
                 <th>Pregunta</th>
                 <th>Respuesta</th>
             </tr>
@@ -14,6 +15,7 @@
         <tbody>
             @foreach($respuestas as $pregunta)
                 <tr>
+                    <td>{{ $pregunta->category }}</td>
                     <td>{{ $pregunta->question_text }}</td>
                     <td>
                         {{ optional($pregunta->answers->first())->answered ?? 'Sin responder' }}

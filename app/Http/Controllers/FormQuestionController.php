@@ -29,14 +29,15 @@ class FormQuestionController extends Controller
         ]);
 
         $form->questions()->create($request->only([
-            'question_text', 'question_type', 'options', 'order', 'active'
-        ]) + ['active' => $request->has('active')]);
+            'question_text', 'question_type', 'options', 'order'
+        ]) + ['active' => (bool)$request->input('active')]);
 
         return redirect()->route('forms.questions.index', $form)->with('success', 'Pregunta creada');
     }
 
     public function edit(Form $form, FormQuestion $question)
     {
+        // dd($question);
         return view('forms.questions.edit', compact('form', 'question'));
     }
 

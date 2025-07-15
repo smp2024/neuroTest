@@ -38,7 +38,7 @@ class PatientController extends Controller
             'relatives.*.type_person' => 'required',
             'relatives.*.name' => 'required|string',
             'relatives.*.surname' => 'required|string',
-            'relatives.*.email' => 'nullable|email',
+            // 'relatives.*.email' => 'nullable|email',
             'relatives.*.mobile' => 'nullable|string',
             'relatives.*.relationship' => 'nullable|string',
         ];
@@ -153,19 +153,24 @@ class PatientController extends Controller
                 $per = PatientPerson::find($persona->id);
                 $per->whatsapp_link = "https://wa.me/52{$persona->telefono}?text=$msg";
                 $per->form_link = $url;
+                $per->token = $formLink->token;
+
                 $per->save();
 
+
+
             }
-        }
+            $formLinkTitular = PatientPerson::where('patient_id', $patient->id)
+                ->where('type_person', 0)
+                ->first();
+                // dd($formLinkTitular);
+            if (!$formLinkTitular) {
+                    return back()->with('message', 'No se encontró el enlace del titular')->with('typealert', 'danger');
+            }
+            return redirect()->route('form.familiares', $formLinkTitular->token);
+    }
 
-        $formLinkTitular = PatientPerson::where('patient_id', $patient->id)
-            ->where('type_person', 0)
-            ->first();
 
-        if (!$formLinkTitular) {
-            return back()->with('message', 'No se encontró el enlace del titular')->with('typealert', 'danger');
-        }
-        return redirect()->route('form.familiares', $formLinkTitular->token);
 
     }
 

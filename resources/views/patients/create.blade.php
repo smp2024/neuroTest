@@ -1,7 +1,7 @@
 @extends('welcome')
 
 @section('content')
-<div class="container mt-4 mb-5">
+<div class="p-3">
     <h3>Agregar Paciente</h3>
     <form  method="POST" action="{{ route('store') }}" enctype="multipart/form-data" id="form_patient">
         {{-- CSRF Token --}}
@@ -10,31 +10,31 @@
         {{-- DATOS DEL PACIENTE --}}
         <div class="card mb-4 p-4">
             <div class="form-row">
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label>Nombre</label>
                     <input type="text" name="name" class="form-control" >
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label>Apellido Paterno</label>
                     <input type="text" name="paternal_surname" class="form-control" >
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label>Apellido Materno</label>
                     <input type="text" name="maternal_surname" class="form-control" >
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label>Email</label>
                     <input type="email" name="email" class="form-control" >
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label>Teléfono</label>
                     <input type="text" name="mobile" class="form-control" >
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label>Fecha de nacimiento</label>
                     <input type="date" name="birth_date" class="form-control" >
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label>Género</label><br>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="gender" value="Male" > Masculino
@@ -43,21 +43,15 @@
                         <input class="form-check-input" type="radio" name="gender" value="Female"> Femenino
                     </div>
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label>Nivel Escolar</label>
                     <input type="text" name="education" class="form-control">
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label>Foto</label>
                     <input type="file" name="avatar" class="form-control-file">
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label>Dirección (Calle)</label>
-                    <input type="text" name="address" class="form-control">
-                </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label>Código Postal</label>
                     <div class="input-group">
                         <input type="text" id="postal_code" name="postal_code" class="form-control" >
@@ -65,6 +59,20 @@
                             <button type="button" class="btn btn-primary" id="validate_cp">Validar C.P.</button>
                         </div>
                     </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Dirección (Calle)</label>
+                    <input type="text" name="address" class="form-control">
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label>No. Ext</label>
+                    <input type="text" name="address" class="form-control">
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label>No. Int</label>
+                    <input type="text" name="address" class="form-control">
                 </div>
                 <div class="form-group col-md-4">
                     <label>Estado</label>
@@ -95,7 +103,7 @@
                             <option value="2">Especialista</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-2">
+                    <div class="form-group col-md-1">
                         <label>Parentezco</label>
                         <select name="relatives[0][relationship]" class="form-control" >
                             <option value="Padre">Padre</option>
@@ -105,30 +113,30 @@
                             <option value="Abuelo">Abuelo</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-2">
                         <label>Nombre(s)</label>
                         <input type="text" name="relatives[0][name]" class="form-control" >
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-2">
                         <label>Apellido(s)</label>
                         <input type="text" name="relatives[0][surname]" class="form-control" >
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-2">
                         <label>Teléfono(celular)</label>
                         <input type="text" name="relatives[0][mobile]" class="form-control" >
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-2">
                         <label>Email</label>
                         <input type="email" name="relatives[0][email]" class="form-control" >
                     </div>
-                    <div class="form-group col-md-4 d-flex align-items-end">
+                    <div class="form-group col-md-1 d-flex align-items-end">
                         <button type="button" class="btn btn-danger btn-sm remove-relative d-none">Eliminar</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <button type="button" id="add-relative" class="btn btn-outline-primary mb-3">+ Agregar Familiar</button>
+        <button type="button" id="add-relative" class="btn btn-outline-primary mb-3">+ Agregar Persona</button>
         <br>
         {{-- <button type="submit" class="btn btn-success">Guardar</button> --}}
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmModal">

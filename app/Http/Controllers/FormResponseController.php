@@ -11,7 +11,10 @@ class FormResponseController extends Controller
                     ->latest()
                     ->get();
         // dd($links);
-        return view('admin.respuestas.index', compact('links'));
+        $data = [
+            'links' => $links,
+        ];
+        return view('admin.respuestas.index',  $data);
     }
 
     public function show(FormLink $formLink)

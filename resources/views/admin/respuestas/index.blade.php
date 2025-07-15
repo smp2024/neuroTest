@@ -12,6 +12,8 @@
                 <th>Formulario</th>
                 <th>Estado</th>
                 <th>Fecha de respuesta</th>
+                <th>Fecha de expiración</th>
+                <th>Link</th>
                 <th>Acción</th>
             </tr>
         </thead>
@@ -45,6 +47,43 @@
                             'Sin respuesta'
                         @endif
                         {{-- {{ optional($link->updated_at    )->format('d/m/Y H:i') ?? '—' }}</td> --}}
+                    </td>
+                    <td>
+
+                        {{ $link->expires_at }}
+
+                    </td>
+                    <td>
+                <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#linkModal{{ $link->id }}">
+                    Ver Link
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="linkModal{{ $link->id }}" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel{{ $link->id }}" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="linkModalLabel{{ $link->id }}">Link de formulario</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <p>
+                            <strong>Link:</strong>
+                            <a href="{{ $link->person->form_link }}" target="_blank">{{ $link->person->form_link }}</a>
+                        </p>
+                      </div>
+                      <div class="modal-footer">
+                        <form action="" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-warning">Volver a enviar</button>
+                        </form>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                     </td>
                     <td>
                         @if($link->isUsed())
