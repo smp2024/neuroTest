@@ -45,12 +45,12 @@
                             <span class="navbar-toggler-icon"></span>
                         </button>
                         <div class="collapse navbar-collapse" id="navbarNav">
-                            <ul class="navbar-nav">
-
+                            <ul class="navbar-nav w-100 d-flex justify-content-end">
                             @auth
-                               <li class="nav-item {{ Route::currentRouteName() == 'respuestas.index' ? 'active' : '' }}">
+
+                               {{-- <li class="nav-item {{ Route::currentRouteName() == 'respuestas.index' ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ url('/respuestas') }}">Respuestas <span class="sr-only">(current)</span></a>
-                                </li>
+                                </li> --}}
                                   <li class="nav-item {{ Route::currentRouteName() == 'forms.index' ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ url('/forms') }}">Formularios <span class="sr-only">(current)</span></a>
                                 </li>
@@ -71,7 +71,7 @@
                                     </ul>
                                 </li>
                             @else
-                                <li class="nav-item {{ Route::currentRouteName() == 'login' ? 'active' : '' }}">
+                                <li class="nav-item {{ Route::currentRouteName() == 'login' ? 'active' : '' }} ">
                                     <a class="nav-link" href="{{ url('/login') }}">Login <span class="sr-only">(current)</span></a>
                                 </li>
                             @endauth
