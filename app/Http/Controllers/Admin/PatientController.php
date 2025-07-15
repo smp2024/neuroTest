@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Form;
 use App\Models\FormLink;
+use App\Models\FormPatient;
 use App\Models\Patient;
 use App\Models\PatientPerson;
 use App\Notifications\FormLinkNotification;
@@ -16,6 +17,115 @@ use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 class PatientController extends Controller
 {
+
+    public function index()
+    {
+        $patients = Patient::withCount([
+            'getPersons as forms_count',
+            'getPersons as answered_count' => function($q) {
+                $q->whereHas('formLink', function($q2) {
+                    $q2->whereNotNull('expires_at');
+                });
+            }
+        ])->get();
+        return view('patients.index', compact('patients'));
+    }
+
+    public function show($id)
+    {
+        // dd('show' , $id);
+        $patient = Patient::with(['getPersons.formLink.form', 'getDirection'])->findOrFail($id);
+        // dd($patient);
+        $forms_count = $patient->getPersons->count();
+        $answered_count = $patient->getPersons->filter(function($p) {
+            return optional($p->formLink)->expires_at !== null;
+        })->count();
+        $age = $patient->birth_date ? \Carbon\Carbon::parse($patient->birth_date)->age : null;
+
+        // Obtener datos reales de respuestas para la gráfica con detalles
+        // Inicializar datos para la gráfica
+        $scatterData = [];
+
+        // Obtener todas las respuestas de form_patients relacionadas con el paciente
+        $formPatients = FormPatient::where('patient_id', $patient->id)
+            ->get();
+            // dd($formPatients[4]->resp);
+            $i = 1;
+        foreach ($formPatients as $fp) {
+            $person = $patient->getPersons->where('id', $fp->patient_person_id)->first();
+            $form = Form::find($fp->form_id);
+
+            // Obtener todas las respuestas por pregunta
+            $details = [];
+            // if (is_string($fp->resp)) {
+            //     $decoded = json_decode($fp->resp, true);
+            //     if (is_array($decoded)) {
+            //         $details = $decoded;
+            //     }
+            // } elseif (is_array($fp->resp)) {
+            //     $details = $fp->resp;
+            // }
+            $details = $fp->resp;
+            $score = is_array($details) ? array_sum($details) : 0;
+
+            $scatterData[] = [
+            'x' => $i++,
+            'y' => $details,
+            'label' => $person ? ($person->name_companion . ' ' . $person->surname_companion) : '',
+            'form' => $form ? $form->name : '',
+            'details' => $details,
+            'comments' => $fp->comments,
+            ];
+        }
+        // dd($scatterData);
+        foreach ($patient->getPersons as $idx => $person) {
+            if (optional($person->formLink)->answered_at) {
+                $formPatients = \App\Models\FormPatient::where('relative_id', $person->id)
+                    ->where('answered', 1)
+                    ->get();
+                foreach ($formPatients as $fp) {
+                    $score = 0;
+                    $details = [];
+                    if (is_string($fp->answers)) {
+                        $decoded = json_decode($fp->answers, true);
+                        if (is_array($decoded)) {
+                            $score = array_sum($decoded);
+                            $details = $decoded;
+                        }
+                    } elseif (is_array($fp->answers)) {
+                        $score = array_sum($fp->answers);
+                        $details = $fp->answers;
+                    }
+                    $scatterData[] = [
+                        'x' => $idx+1,
+                        'y' => $score,
+                        'label' => $person->name_companion . ' ' . $person->surname_companion,
+                        'form' => optional($person->formLink->form)->name,
+                        'details' => $details
+                    ];
+                }
+            }
+        }
+        return view('patients.profile', compact('patient', 'forms_count', 'answered_count', 'age', 'scatterData'));
+    }
+
+    public function edit(Request $request, $id)
+    {
+        $patient = Patient::with(['getPersons'])->findOrFail($id);
+        // dd($patient->getPersons);
+        $relatives = $patient->getPersons ?? collect();
+        return view('patients.edit', compact('patient', 'relatives'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $patient = Patient::findOrFail($id);
+        // dd('papa',$patient);
+        // Validar y actualizar los datos del paciente
+        $patient->update($request->all());
+        return redirect()->route('patient.edit', $id)->with('message', 'Paciente actualizado correctamente');
+    }
+
     public function create()
     {
         return view('patients.create');
@@ -168,7 +278,7 @@ class PatientController extends Controller
                     return back()->with('message', 'No se encontró el enlace del titular')->with('typealert', 'danger');
             }
             return redirect()->route('form.familiares', $formLinkTitular->token);
-    }
+        }
 
 
 

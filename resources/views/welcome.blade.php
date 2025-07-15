@@ -46,13 +46,37 @@
                         </button>
                         <div class="collapse navbar-collapse" id="navbarNav">
                             <ul class="navbar-nav">
-                                <li class="nav-item {{ Route::currentRouteName() == 'respuestas.index' ? 'active' : '' }}">
+
+                            @auth
+                               <li class="nav-item {{ Route::currentRouteName() == 'respuestas.index' ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ url('/respuestas') }}">Respuestas <span class="sr-only">(current)</span></a>
                                 </li>
                                   <li class="nav-item {{ Route::currentRouteName() == 'forms.index' ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ url('/forms') }}">Formularios <span class="sr-only">(current)</span></a>
                                 </li>
+                                <li class="nav-item {{ Route::currentRouteName() == 'patients.index' ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ url('/patients') }}">Pacientes <span class="sr-only">(current)</span></a>
+                                </li>
+
+                                <li class="nav-item  link-user dropdow ">
+                                    <a href="#" class="nav-link   dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">Hola: {{ Auth::user()->name }} </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <li>
+                                            <a href="{{ url('/logout') }}" class="nav-link " data-toggle="tooltip" data-placement="top" title="Salir">
+                                                <i class="fas fa-power-off">
+                                                    Cerrar sesión
+                                                </i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            @else
+                                <li class="nav-item {{ Route::currentRouteName() == 'login' ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ url('/login') }}">Login <span class="sr-only">(current)</span></a>
+                                </li>
+                            @endauth
                             </ul>
+
                         </div>
                     </nav>
                 <!--Alert errors-->
@@ -86,6 +110,8 @@
                     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
                     <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
                     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                     <script src="{{ asset('js/site.js') }}"></script>
 
 

@@ -3,7 +3,7 @@
 @section('content')
 <div class="p-3">
     <h3>Agregar Paciente</h3>
-    <form  method="POST" action="{{ route('store') }}" enctype="multipart/form-data" id="form_patient">
+    <form  method="POST" action="{{ route('patients.store') }}" enctype="multipart/form-data" id="form_patient">
         {{-- CSRF Token --}}
         @csrf
 

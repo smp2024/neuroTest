@@ -47,5 +47,8 @@ class Patient extends Model
     public function getDirection() {
         return $this->hasOne(DirectionUser::class, 'patient_id');
     }
+    public function getFormLink() {
+        return $this->hasOne(FormPatient::class, 'patient_id');
+    }
 
 }

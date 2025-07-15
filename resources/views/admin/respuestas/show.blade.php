@@ -18,7 +18,7 @@
                     <td>{{ $pregunta->category }}</td>
                     <td>{{ $pregunta->question_text }}</td>
                     <td>
-                        {{ optional($pregunta->answers->first())->answered ?? 'Sin responder' }}
+                        {{ optional($pregunta->answers->first())->resp ?? 'Sin responder' }}
                     </td>
                 </tr>
             @endforeach

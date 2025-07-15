@@ -9,9 +9,15 @@ use App\Http\Controllers\FormResponseController;
 Route::get('/', function () {
     return view('patients.create');
 });
-Route::get('/pacientes/crear', [PatientController::class, 'create'])->name('create');
-Route::post('/pacientes/guardar', [PatientController::class, 'store'])->name('store');
+Route::get('/pacientes/crear', [PatientController::class, 'create'])->name('patients.create');
+Route::post('/pacientes/guardar', [PatientController::class, 'store'])->name('patients.store');
 Route::post('/cp/validar', [PatientController::class, 'validateCP']);
+Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+// Route::post('/patients/{id}', [PatientController::class, 'show'])->name('patients.show');
+// Route::post('/patient/{id}', [PatientController::class, 'edit'])->name('patient.edit');
+Route::get('/patients/{id}', [PatientController::class, 'show'])->name('patients.show');
+Route::get('/patient/{id}', [PatientController::class, 'edit'])->name('patient.edit');
+Route::put('/patients/{id}', [PatientController::class, 'update'])->name('patients.update');
 
 Route::get('/formulario/{token}', [FormController::class, 'mostrar']);
 Route::post('/formulario/{token}', [FormController::class, 'guardar'])->name('formulario.guardar');
@@ -38,7 +44,16 @@ Route::post('/formulario/{token}', [FormController::class, 'guardar'])->name('fo
     Route::get('/respuestas/{formLink}/export', [FormResponseController::class, 'export'])->name('respuestas.export');
 // });
 
+use App\Http\Controllers\AuthController;
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
 Route::get('/formulario/{token}/familiares', [FormController::class, 'formFam'])->name('form.familiares');
 Route::post('/formulario/{token}/familiares', [FormController::class, 'storeRespuestasFamiliares'])->name('familiares.store');
+
 
 
