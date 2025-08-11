@@ -3,7 +3,7 @@
 @section('content')
 <div class="p-3">
     <h3>Agregar Paciente</h3>
-    <form  method="POST" action="{{ route('store') }}" enctype="multipart/form-data" id="form_patient">
+    <form  method="POST" action="{{ route('patients.store') }}" enctype="multipart/form-data" id="form_patient">
         {{-- CSRF Token --}}
         @csrf
 
@@ -34,18 +34,46 @@
                     <label>Fecha de nacimiento</label>
                     <input type="date" name="birth_date" class="form-control" >
                 </div>
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-2">
                     <label>Género</label><br>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" value="Male" > Masculino
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" value="Female"> Femenino
-                    </div>
+                    <select name="gender" class="form-control">
+                        <option value="">Seleccione</option>
+                        <option value="Male">Hombre</option>
+                        <option value="Female">Mujer</option>
+                        <option value="Other">Otro</option>
+                    </select>
                 </div>
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-2">
                     <label>Nivel Escolar</label>
-                    <input type="text" name="education" class="form-control">
+                    <select name="education_level" class="form-control">
+                        <option value="">Seleccione</option>
+                        <option value="Maternal">Maternal</option>
+                        <option value="Kinder">Kinder</option>
+                        <option value="Primaria">Primaria</option>
+                        <option value="Secundaria">Secundaria</option>
+                        <option value="Preparatoria">Preparatoria</option>
+                        <option value="Licenciatura">Licenciatura</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Grado Escolar</label>
+                    <select name="education_grade" class="form-control">
+                        <option value="">Seleccione</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+
+                    </select>
                 </div>
                 <div class="form-group col-md-3">
                     <label>Foto</label>
@@ -60,31 +88,36 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="form-group col-md-3">
+                    <label>Estado</label>
+                    <select name="state" id="state" class="form-control" ></select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label>Ciudad</label>
+                    <select name="city" id="city" class="form-control" ></select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label>Colonia</label>
+                    <select name="colony" id="colony" class="form-control" ></select>
+                </div>
                 <div class="form-group col-md-4">
-                    <label>Dirección (Calle)</label>
-                    <input type="text" name="address" class="form-control">
+                    <label>Dirección</label>
+                    <input type="text" name="street" class="form-control">
                 </div>
 
                 <div class="form-group col-md-1">
                     <label>No. Ext</label>
-                    <input type="text" name="address" class="form-control">
+                    <input type="text" name="interior_number" class="form-control">
                 </div>
 
                 <div class="form-group col-md-1">
                     <label>No. Int</label>
-                    <input type="text" name="address" class="form-control">
+                    <input type="text" name="exterior_number" class="form-control">
                 </div>
-                <div class="form-group col-md-4">
-                    <label>Estado</label>
-                    <select name="state" id="state" class="form-control" ></select>
-                </div>
-                <div class="form-group col-md-4">
-                    <label>Ciudad</label>
-                    <select name="city" id="city" class="form-control" ></select>
-                </div>
-                <div class="form-group col-md-4">
-                    <label>Colonia</label>
-                    <select name="colony" id="colony" class="form-control" ></select>
+                <div class="form-group col-md-3">
+                    <label>Referencias</label>
+                    <input type="text" name="reference" class="form-control">
                 </div>
             </div>
 
@@ -191,22 +224,24 @@ $(document).on('click', '.submit-form', function() {
 $('#validate_cp').click(function() {
     let cp = $('#postal_code').val();
     $.ajax({
-        url: '{{ url("/cp/validar") }}',
+        url: '{{ url("/api/cp-validar") }}',
         type: 'POST',
         data: {
             _token: '{{ csrf_token() }}',
             cp: cp
         },
         success: function(data) {
-            $('#state').html(`<option value="${data.estado}">${data.estado}</option>`);
-            $('#city').html(`<option value="${data.municipio}">${data.municipio}</option>`);
+            $('#state').html(`<option value="${data.state}">${data.state}</option>`);
+            $('#city').html(`<option value="${data.municipality}">${data.municipality}</option>`);
             $('#colony').html('');
-            data.colonias.forEach(colonia => {
-                $('#colony').append(`<option value="${colonia}">${colonia}</option>`);
+            data.colonies.forEach(colonia => {
+                $('#colony').append(`<option value="${colonia.name}">${colonia.name}</option>`);
             });
         },
         error: function() {
             alert('Código postal no encontrado.');
+            console.log(data);
+
         }
     });
 });

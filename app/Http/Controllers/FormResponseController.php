@@ -17,17 +17,15 @@ class FormResponseController extends Controller
         return view('admin.respuestas.index',  $data);
     }
 
-    public function show(FormLink $formLink)
+    public function show($id)
     {
+        $formLink = FormLink::findOrFail($id);
         $form = $formLink->form;
         $person = $formLink->person;
 
-        // $respuestas = $form->questions()->with(['respuestas' => function($q) use ($formLink) {
-        // Replace 'respuestas' with the correct relationship name defined in FormQuestion model, e.g., 'answers'
         $respuestas = $form->questions()->with(['answers' => function($q) use ($formLink) {
-            $q->where('patient_id', $formLink->patient_id);
+            $q->where('patient_id', $formLink->patient_id)->where('patient_person_id', $formLink->relative_id);
         }])->get();
-        // dd($respuestas);
         return view('admin.respuestas.show', compact('formLink', 'respuestas', 'person', 'form'));
     }
 }

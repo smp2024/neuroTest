@@ -76,6 +76,80 @@ class FormController extends Controller
         return view('formulario.gracias');
     }
 
+    public function storeRespuestas(Request $request, $token)
+    {
+        $link = FormLink::where('token', $token)->firstOrFail();
+
+        foreach ($request->answers as $question_id => $value) {
+            FormPatient::create([
+                'form_id' => $link->form_id,
+                'form_question_id' => $question_id,
+                'form_id' => $link->form_id,
+                'form_question_id' => $question_id,
+                'patient_person_id' => $link->patient_id,
+                'value' => $value
+            ]);
+        }
+
+        $link->update(['used_at' => now()]);
+
+        return view('formulario.gracias');
+    }
+
+    public function formFam($token)
+    {
+        $tk= Str::replaceFirst(' ', '', $token);
+        $token = Str::replaceFirst(' ', '', $tk);
+        $link = FormLink::where('token', $token)->firstOrFail();
+        $questions = formQuestion::all();
+
+        if ($link->used) {
+            abort(403, 'Este formulario ya fue contestado.');
+        }
+
+        if (now()->greaterThan($link->expires_at)) {
+            abort(403, 'El formulario ha expirado.');
+        }
+        $data = [
+            'token' => $token,
+            'patient' => $link->patient,
+            'relative' => $link->relative,
+            'questions' => $questions,
+            'link' => $link
+        ];
+        // dd($data);
+        return view('forms.familiares', $data);
+
+    }
+    public function storeRespuestasFamiliares(Request $request, $token)
+    {
+        $link = FormLink::where('token', $token)->first();
+        if ($link->used_at || now()->greaterThan($link->expires_at)) {
+            return abort(403, 'No puedes enviar este formulario.');
+        }
+        $resp = $request->answers;
+        if (empty($resp)) {
+            return redirect()->back()->with('error', 'No se han enviado respuestas.');
+        }
+        foreach ($request->answers as $question_id => $answer) {
+            $fp = new FormPatient();
+            $fp->form_id = $link->form_id;
+            $fp->form_question_id = $question_id;
+            $fp->patient_id = $link->patient_id;
+            $fp->patient_person_id = $link->relative_id;
+            $fp->question_id = $question_id;
+            $fp->resp = $answer;
+            $fp->comments = $request->{'comment_' . $question_id} ?? null;
+            $fp->save();
+        }
+        $link->used_at = true;
+        $link->save();
+        return view('forms.gracias');
+    }
+
+
+    //listas
+
 
     public function index()
     {
@@ -133,84 +207,4 @@ class FormController extends Controller
         return back()->with('success', 'Formulario eliminado');
     }
 
-    public function storeRespuestas(Request $request, $token)
-    {
-        $link = FormLink::where('token', $token)->firstOrFail();
-
-        foreach ($request->answers as $question_id => $value) {
-            FormPatient::create([
-                'form_id' => $link->form_id,
-                'form_question_id' => $question_id,
-                'form_id' => $link->form_id,
-                'form_question_id' => $question_id,
-                'patient_person_id' => $link->patient_id,
-                'value' => $value
-            ]);
-        }
-
-        $link->update(['used_at' => now()]);
-
-        return view('formulario.gracias');
-    }
-
-    public function formFam($token)
-    {
-        $tk= Str::replaceFirst(' ', '', $token);
-        $token = Str::replaceFirst(' ', '', $tk);
-        $link = FormLink::where('token', $token)->firstOrFail();
-        $questions = formQuestion::all();
-
-        if ($link->used) {
-            abort(403, 'Este formulario ya fue contestado.');
-        }
-
-        if (now()->greaterThan($link->expires_at)) {
-            abort(403, 'El formulario ha expirado.');
-        }
-        $data = [
-            'token' => $token,
-            'patient' => $link->patient,
-            'relative' => $link->relative,
-            'questions' => $questions,
-            'link' => $link
-        ];
-        // dd($data);
-        return view('forms.familiares', $data);
-
-    }
-    public function storeRespuestasFamiliares(Request $request, $token)
-    {
-        // dd($request->all());
-        $link = FormLink::where('token', $token)->first();
-        if ($link->used_at || now()->greaterThan($link->expires_at)) {
-            return abort(403, 'No puedes enviar este formulario.');
-        }
-        $resp = $request->answers;
-        if (empty($resp)) {
-            return redirect()->back()->with('error', 'No se han enviado respuestas.');
-        }
-        // dd($resp);
-        foreach ($request->answers as $question_id => $answer) {
-            // FormPatient::create([
-            //     'form_id' => $link->form_id,
-            //     'form_question_id' => $question_id,
-            //     'patient_id' => $link->patient_id,
-            //     'relative_id' => $link->relative_id,
-            //     'question_id' => $question_id,
-            //     'answer' => $answer
-            // ]);
-            $fp = new FormPatient();
-            $fp->form_id = $link->form_id;
-            $fp->form_question_id = $question_id;
-            $fp->patient_id = $link->patient_id;
-            $fp->patient_person_id = $link->relative_id;
-            $fp->question_id = $question_id;
-            $fp->answered = $answer;
-            $fp->comments = $request->{'comment_' . $question_id} ?? null;
-            $fp->save();
-        }
-        $link->used_at = true;
-        $link->save();
-        return view('forms.gracias');
-    }
 }
