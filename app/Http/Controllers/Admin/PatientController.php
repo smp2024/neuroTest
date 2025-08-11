@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\DirectionUser;
 use App\Models\Form;
 use App\Models\FormLink;
 use App\Models\FormPatient;
 use App\Models\Patient;
 use App\Models\PatientPerson;
+use App\Models\PostalCode;
 use App\Notifications\FormLinkNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -33,23 +35,18 @@ class PatientController extends Controller
 
     public function show($id)
     {
-        // dd('show' , $id);
         $patient = Patient::with(['getPersons.formLink.form', 'getDirection'])->findOrFail($id);
-        // dd($patient);
         $forms_count = $patient->getPersons->count();
         $answered_count = $patient->getPersons->filter(function($p) {
             return optional($p->formLink)->expires_at !== null;
         })->count();
         $age = $patient->birth_date ? \Carbon\Carbon::parse($patient->birth_date)->age : null;
 
-        // Obtener datos reales de respuestas para la gráfica con detalles
-        // Inicializar datos para la gráfica
         $scatterData = [];
 
         // Obtener todas las respuestas de form_patients relacionadas con el paciente
         $formPatients = FormPatient::where('patient_id', $patient->id)
             ->get();
-            // dd($formPatients[4]->resp);
             $i = 1;
         foreach ($formPatients as $fp) {
             $person = $patient->getPersons->where('id', $fp->patient_person_id)->first();
@@ -57,14 +54,6 @@ class PatientController extends Controller
 
             // Obtener todas las respuestas por pregunta
             $details = [];
-            // if (is_string($fp->resp)) {
-            //     $decoded = json_decode($fp->resp, true);
-            //     if (is_array($decoded)) {
-            //         $details = $decoded;
-            //     }
-            // } elseif (is_array($fp->resp)) {
-            //     $details = $fp->resp;
-            // }
             $details = $fp->resp;
             $score = is_array($details) ? array_sum($details) : 0;
 
@@ -77,7 +66,7 @@ class PatientController extends Controller
             'comments' => $fp->comments,
             ];
         }
-        // dd($scatterData);
+
         foreach ($patient->getPersons as $idx => $person) {
             if (optional($person->formLink)->answered_at) {
                 $formPatients = \App\Models\FormPatient::where('relative_id', $person->id)
@@ -206,20 +195,26 @@ class PatientController extends Controller
                 'email'     => $request->email,
                 'mobile'    => $request->mobile,
                 'gender'    => $request->gender,
-                'education' => $request->education,
+                'education_level' => $request->education_level,
+                'education_grade' => $request->education_grade,
                 'birth_date' => $request->birth_date,
                 'avatar'    => $avatar,
                 'n_document' => $n_document,
 
             ]);
             // Guardar dirección del paciente
-            $patient->getDirection()->create([
-                'postal_code' => $request->postal_code,
-                'state'       => $request->state,
-                'city'        => $request->city,
-                'colony'      => $request->colony,
-            ]);
-
+            $diretion = new DirectionUser();
+            $diretion->postal_code = $request->postal_code;
+            $diretion->state = $request->state;
+            $diretion->municipality = $request->city;
+            $diretion->city = $request->city;
+            $diretion->colony = $request->colony;
+            $diretion->street = $request->street;
+            $diretion->interior_number = $request->interior_number;
+            $diretion->exterior_number = $request->exterior_number;
+            $diretion->references = $request->reference;
+            $diretion->patient_id = $patient->id;
+            $diretion->save();
 
             $familiaresData = $request->input('relatives', []);
             $titular = null;
@@ -273,7 +268,6 @@ class PatientController extends Controller
             $formLinkTitular = PatientPerson::where('patient_id', $patient->id)
                 ->where('type_person', 0)
                 ->first();
-                // dd($formLinkTitular);
             if (!$formLinkTitular) {
                     return back()->with('message', 'No se encontró el enlace del titular')->with('typealert', 'danger');
             }
@@ -287,24 +281,39 @@ class PatientController extends Controller
     public function validateCP(Request $request)
     {
         $cp = $request->cp;
-        $jsonPath = base_path('public/cp_mexico.json');
+        $jsonPath = PostalCode::where('postal_code', $cp)->get();
 
-        if (!file_exists($jsonPath)) {
-            return response()->json(['error' => 'Base de datos CP no disponible'], 404);
-        }
-
-        $json = json_decode(file_get_contents($jsonPath), true);
-        $info = collect($json)->firstWhere('codigo_postal', $cp);
-
-        if (!$info) {
+        if ($jsonPath->isEmpty()) {
             return response()->json(['error' => 'Código postal no encontrado'], 404);
         }
+        $colonies = [];
+        $state = null;
+        $municipality = null;
+
+        foreach ($jsonPath as $item) {
+            if (!$state) {
+                $state = $item->state ?? $item->estado;
+            }
+            if (!$municipality) {
+                $municipality = $item->municipality;
+            }
+            $colonies[] = [
+                'id' => $item->id,
+                'name' => $item->colony,
+            ];
+        }
+
+        // Ordenar colonias por nombre
+        usort($colonies, function ($a, $b) {
+            return strcmp($a['name'], $b['name']);
+        });
 
         return response()->json([
-            'estado'   => $info['estado'],
-            'municipio'=> $info['municipio'],
-            'colonias'=> explode('|', $info['colonias'])
+            'state' => $state,
+            'municipality' => $municipality,
+            'colonies' => $colonies,
         ]);
+
     }
 
 

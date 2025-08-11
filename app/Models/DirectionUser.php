@@ -19,6 +19,7 @@ class DirectionUser extends Model
         'city',
         'state',
         'country',
+        'references',
     ];
 
     public function user()

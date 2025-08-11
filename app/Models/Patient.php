@@ -14,11 +14,9 @@ class Patient extends Model
      use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name', 'surname', 'email', 'mobile', 'gender',
-        'education', 'address', 'birth_date', 'n_document',
-        'avatar', 'antecedent_family', 'antecedent_personal',
-        'antecedent_allergic', 'pa', 'temperatura', 'fc',
-        'fr', 'ta', 'peso', 'current_disease'
+        'name', 'paternal_surname', 'email', 'mobile', 'gender',
+        'education', 'birth_date', 'n_document',
+        'avatar', 'maternal_surname', 'education_level', 'education_grade'
     ];
 
     public function setCreatedAtAttribute($value)

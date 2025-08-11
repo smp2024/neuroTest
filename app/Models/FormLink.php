@@ -35,7 +35,7 @@ class FormLink extends Model
 
     public function person()
     {
-        return $this->belongsTo(PatientPerson::class, 'patient_id', 'patient_id');
+        return $this->belongsTo(PatientPerson::class, 'relative_id', 'id');
     }
 
     public function form()
@@ -52,6 +52,9 @@ class FormLink extends Model
     {
         return $query->where('used', false)
                      ->where('expires_at', '>', now());
+    }
+    public function getAnswered() {
+        return $this->hasMany(FormPatient::class,  'patient_person_id', 'relative_id');
     }
 
 }

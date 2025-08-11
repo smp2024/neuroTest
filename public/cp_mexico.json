@@ -6,9 +6,23 @@
     "colonias": "Colonia Las Águilas|Colonia Merced Gómez|Colonia Olivar de los Padres"
   },
   {
-    "codigo_postal": "03000",
+    "postal_code": "03000",
+    "state": "Ciudad de México",
+    "municipality": "Benito Juárez",
+    "colony": "Colonia Del Valle"
+  },
+
+  {
+    "postal_code": "03000",
     "estado": "Ciudad de México",
-    "municipio": "Benito Juárez",
-    "colonias": "Colonia Del Valle|Colonia Narvarte|Colonia Álamos"
+    "municipality": "Benito Juárez",
+    "colony": "Colonia Narvarte"
+  },
+
+  {
+    "postal_code": "03000",
+    "estado": "Ciudad de México",
+    "municipality": "Benito Juárez",
+    "colony": "Colonia Álamos"
   }
 ]

@@ -49,4 +49,24 @@ class User extends Authenticatable
     public function direction() {
         return $this->hasOne(DirectionUser::class, "user_id" );
     }
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+    public function projectUsers()
+    {
+        return $this->hasMany(ProjectUser::class);
+    }
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+    public function isUser()
+    {
+        return $this->role === 'user';
+    }
+    public function consultorio()
+    {
+        return $this->hasOne(Office::class);
+    }
 }
