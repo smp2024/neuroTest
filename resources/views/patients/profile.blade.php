@@ -47,6 +47,36 @@
                             @if(optional($person->formLink)->token)
                                 <a href="{{ route('respuestas.show', $person->formLink) }}" class="btn btn-primary btn-sm">Ver respuestas</a>
                             @endif
+                        <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#linkModal{{ $person->id }}">
+                            Ver Link
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="linkModal{{ $person->id }}" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel{{ $person->id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="linkModalLabel{{ $person->id }}">Link de formulario</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    <strong>Link:</strong>
+                                    <a href="{{ $person->form_link }}" target="_blank">{{ $person->form_link }}</a>
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <form action="" method="POST" style="display:inline;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-warning">Volver a enviar</button>
+                                </form>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
                         </td>
                     </tr>
                     @endforeach
@@ -60,60 +90,61 @@
 </div>
 @endsection
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // console.log('scatterData');
-
+// Simulación de datos para la gráfica de dispersión
     var scatterData = [
         @foreach($scatterData as $point)
             {
                 x: {{ $point['x'] }},
-                y: {{ $point['y'] }},
+                y: @switch($point['y'])
+                    @case(0) 50 @break
+                    @case(1) 35 @break
+                    @case(2) 25 @break
+                    @case(3) 15 @break
+                    @default {{ $point['y'] }}
+                @endswitch,
                 label: "{{ $point['label'] }}",
                 form: "{{ $point['form'] }}",
                 details: {!! json_encode($point['details']) !!}
             },
         @endforeach
     ];
-    var data = {
+
+console.log('scatterData', scatterData);
+
+const ctx = document.getElementById('scatterChart').getContext('2d');
+const scatterChart = new Chart(ctx, {
+    type: 'line',
+    data: {
         datasets: [{
             label: 'Respuestas',
             data: scatterData,
             backgroundColor: 'rgba(54, 162, 235, 0.6)'
         }]
-    };
-    var config = {
-        type: 'scatter',
-        data: data,
-        options: {
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            var d = context.raw;
-                            return d.label + ' | ' + d.form + ' | Puntaje: ' + d.y;
-                        }
+    },
+    options: {
+        scales: {
+            x: {
+                type: 'linear',
+                position: 'bottom',
+                title: { display: true, text: 'Eje X' }
+            },
+            y: {
+                title: { display: true, text: 'Eje Y' }
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const label = scatterData[context.dataIndex].label || '';
+                        return label + ': (' + context.parsed.x + ', ' + context.parsed.y + ')';
                     }
                 }
-            },
-            onClick: function(evt, elements) {
-                if (elements.length > 0) {
-                    var idx = elements[0].index;
-                    var d = scatterData[idx];
-                    var html = '<h5>Detalles de respuestas de ' + d.label + '</h5>';
-                    html += '<ul>';
-                    for (const [q, val] of Object.entries(d.details)) {
-                        html += '<li><strong>Pregunta ' + q + ':</strong> ' + val + '</li>';
-                    }
-                    html += '</ul>';
-                    document.getElementById('scatterDetails').innerHTML = html;
-                }
-            },
-            scales: {
-                x: { title: { display: true, text: 'Preguntas' } },
-                y: { title: { display: true, text: 'Puntaje' } }
             }
         }
-    };
-    var chart = new Chart(document.getElementById('scatterChart'), config);
+    }
+});
 </script>
 @endsection

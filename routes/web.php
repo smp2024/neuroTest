@@ -16,26 +16,43 @@ Route::get('/', function () {
     return view('patients.create');
 });
 
-// Ruta para seleccionar proyecto activo
-Route::post('/select-project', function(Request $request) {
-    $request->validate(['project_id' => 'required|exists:projects,id']);
-    session(['selected_project_id' => $request->project_id]);
-    return redirect()->back();
-})->middleware('auth');
-Route::get('/pacientes/crear', [PatientController::class, 'create'])->name('patients.create');
-Route::post('/pacientes/guardar', [PatientController::class, 'store'])->name('patients.store');
-Route::post('/api/cp-validar', [PatientController::class, 'validateCP'])->withoutMiddleware([VerifyCsrfToken::class]);
-Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
-// Route::post('/patients/{id}', [PatientController::class, 'show'])->name('patients.show');
-// Route::post('/patient/{id}', [PatientController::class, 'edit'])->name('patient.edit');
-Route::get('/patients/{id}', [PatientController::class, 'show'])->name('patients.show');
-Route::get('/patient/{id}', [PatientController::class, 'edit'])->name('patient.edit');
-Route::put('/patients/{id}', [PatientController::class, 'update'])->name('patients.update');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Formularios públicos
 Route::get('/formulario/{token}', [FormController::class, 'mostrar']);
 Route::post('/formulario/{token}', [FormController::class, 'guardar'])->name('formulario.guardar');
+Route::get('/formulario/{token}/familiares', [FormController::class, 'formFam'])->name('form.familiares');
+Route::post('/formulario/{token}/familiares', [FormController::class, 'storeRespuestasFamiliares'])->name('familiares.store');
 
-// Route::prefix('admin/forms')->name('forms.')->group(function () {
+
+Route::prefix('api')->group(function () {
+    // API pública para validar CP
+    Route::post('/cp-validar', [PatientController::class, 'validateCP'])->withoutMiddleware([VerifyCsrfToken::class]);
+});
+
+
+Route::get('/pacientes/crear', [PatientController::class, 'create'])->name('patients.create');
+Route::post('/pacientes/guardar', [PatientController::class, 'store'])->name('patients.store');
+
+// Rutas protegidas por autenticación
+Route::middleware('auth')->group(function () {
+    // Ruta para seleccionar proyecto activo
+    Route::post('/select-project', function(Request $request) {
+        $request->validate(['project_id' => 'required|exists:projects,id']);
+        session(['selected_project_id' => $request->project_id]);
+        return redirect()->back();
+    });
+
+    Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+    Route::get('/patients/{id}', [PatientController::class, 'show'])->name('patients.show');
+    Route::get('/patient/{id}', [PatientController::class, 'edit'])->name('patient.edit');
+    Route::put('/patients/{id}', [PatientController::class, 'update'])->name('patients.update');
+
+    // Formularios (admin)
     Route::get('/forms', [FormController::class, 'index'])->name('forms.index');
     Route::get('/forms/create', [FormController::class, 'create'])->name('forms.create');
     Route::post('/forms', [FormController::class, 'store'])->name('forms.store');
@@ -55,21 +72,16 @@ Route::post('/formulario/{token}', [FormController::class, 'guardar'])->name('fo
     Route::get('/respuestas', [FormResponseController::class, 'index'])->name('respuestas.index');
     Route::get('/respuestas/{formLink}', [FormResponseController::class, 'show'])->name('respuestas.show');
     Route::get('/respuestas/{formLink}/export', [FormResponseController::class, 'export'])->name('respuestas.export');
-// });
+
+    // Proyectos
+    Route::resource('projects', ProjectController::class);
+
+    // Perfil de usuario
+    Route::get('/profile',  [UserController::class, 'profile'])->name('profile');
+    Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+});
 
 
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/formulario/{token}/familiares', [FormController::class, 'formFam'])->name('form.familiares');
-Route::post('/formulario/{token}/familiares', [FormController::class, 'storeRespuestasFamiliares'])->name('familiares.store');
 
-Route::resource('projects',ProjectController::class);
-
-// User Profile
-Route::get('/profile',  [UserController::class, 'profile'])->name('profile');
-Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 
