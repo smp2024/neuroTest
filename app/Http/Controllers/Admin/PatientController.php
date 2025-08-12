@@ -7,11 +7,13 @@ use App\Models\DirectionUser;
 use App\Models\Form;
 use App\Models\FormLink;
 use App\Models\FormPatient;
+use App\Models\OfficeUser;
 use App\Models\Patient;
 use App\Models\PatientPerson;
 use App\Models\PostalCode;
 use App\Notifications\FormLinkNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
@@ -187,21 +189,61 @@ class PatientController extends Controller
                         rand(100, 999);
 
             // Crear paciente
-            $patient = Patient::create([
-                'name'      => $request->name,
-                'surname'   => $request->surname,
-                'paternal_surname' => $request->paternal_surname,
-                'maternal_surname' => $request->maternal_surname,
-                'email'     => $request->email,
-                'mobile'    => $request->mobile,
-                'gender'    => $request->gender,
-                'education_level' => $request->education_level,
-                'education_grade' => $request->education_grade,
-                'birth_date' => $request->birth_date,
-                'avatar'    => $avatar,
-                'n_document' => $n_document,
+                // 'name'      => $request->name,
+                // 'surname'   => $request->surname,
+                // 'paternal_surname' => $request->paternal_surname,
+                // 'maternal_surname' => $request->maternal_surname,
+                // 'email'     => $request->email,
+                // 'mobile'    => $request->mobile,
+                // 'gender'    => $request->gender,
+                // 'education_level' => $request->education_level,
+                // 'education_grade' => $request->education_grade,
+                // 'birth_date' => $request->birth_date,
+                // 'avatar'    => $avatar,
+                // 'n_document' => $n_document,
+                // 'register_type' => $request->input('register_type', 'proyecto'),
+                // 'register_user_id' => Auth::id(),
+                // 'office_project_id' => session('selected_project_id'),
 
-            ]);
+            $patient = new Patient();
+            $patient->name = $request->name;
+            $patient->paternal_surname = $request->paternal_surname;
+            $patient->maternal_surname = $request->maternal_surname;
+            $patient->email = $request->email;
+            $patient->mobile = $request->mobile;
+            $patient->gender = $request->gender;
+            $patient->education_level = $request->education_level;
+            $patient->education_grade = $request->education_grade;
+            $patient->birth_date = $request->birth_date;
+            $patient->avatar = $avatar;
+            $patient->n_document = $n_document;
+            $patient->avatar = 'avatars/default.png';
+
+            if(!Auth::id()){
+                $patient->register_type = '0';
+                $patient->office_project_id = null;
+                $patient->register_user_id = null;
+            }
+
+            if (session('selected_project_id')) {
+                $patient->register_type = '2';
+                $patient->office_project_id = session('selected_project_id');
+                $patient->register_user_id = Auth::id();
+            } else {
+                $officeUser = OfficeUser::where('user_id', Auth::id())
+                    ->where('status', 1)
+                    ->first();
+
+                $patient->register_type = '1';
+                $patient->office_project_id = $officeUser->office_id;
+                $patient->register_user_id = Auth::id();
+            }
+
+
+
+
+            $patient->save();
+
             // Guardar dirección del paciente
             $diretion = new DirectionUser();
             $diretion->postal_code = $request->postal_code;

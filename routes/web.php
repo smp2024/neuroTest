@@ -10,10 +10,18 @@ use App\Http\Controllers\FormResponseController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ValidateCpController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('patients.create');
 });
+
+// Ruta para seleccionar proyecto activo
+Route::post('/select-project', function(Request $request) {
+    $request->validate(['project_id' => 'required|exists:projects,id']);
+    session(['selected_project_id' => $request->project_id]);
+    return redirect()->back();
+})->middleware('auth');
 Route::get('/pacientes/crear', [PatientController::class, 'create'])->name('patients.create');
 Route::post('/pacientes/guardar', [PatientController::class, 'store'])->name('patients.store');
 Route::post('/api/cp-validar', [PatientController::class, 'validateCP'])->withoutMiddleware([VerifyCsrfToken::class]);

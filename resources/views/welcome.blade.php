@@ -108,6 +108,34 @@
                 <!--Content-->
                 <div class=""  >
                     @yield('content')
+
+                    {{-- Modal de selección de proyecto --}}
+                    @if(session('active_projects') && !session('selected_project_id'))
+                    <div class="modal fade" id="projectModal" tabindex="-1" role="dialog" aria-labelledby="projectModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="projectModalLabel">Selecciona un proyecto activo</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="selectProjectForm" method="POST" action="{{ url('/select-project') }}">
+                                        @csrf
+                                        <div class="form-group">
+                                            <label for="project_id">Proyecto:</label>
+                                            <select class="form-control" id="project_id" name="project_id" required>
+                                                <option value="">-- Selecciona --</option>
+                                                @foreach(session('active_projects') as $project)
+                                                    <option value="{{ $project->id }}">{{ $project->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">Seleccionar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
 
                 <!--Script-->
@@ -125,6 +153,15 @@
 
                 <!--individual-Script-page-->
                     @yield('scripts')
+
+                @if(session('active_projects') && !session('selected_project_id'))
+                <script>
+                    $(document).ready(function() {
+                        $('#projectModal').modal({backdrop: 'static', keyboard: false});
+                        $('#projectModal').modal('show');
+                    });
+                </script>
+                @endif
 
             </body>
     </html>

@@ -16,7 +16,8 @@ class Patient extends Model
     protected $fillable = [
         'name', 'paternal_surname', 'email', 'mobile', 'gender',
         'education', 'birth_date', 'n_document',
-        'avatar', 'maternal_surname', 'education_level', 'education_grade'
+        'avatar', 'maternal_surname', 'education_level', 'education_grade',
+        'register_type', 'register_user_id', 'office_project_id'
     ];
 
     public function setCreatedAtAttribute($value)

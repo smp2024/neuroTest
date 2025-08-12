@@ -9,7 +9,6 @@
                 <label>Nombre:</label>
                 <input type="text" name="name" class="form-control" required>
             </div>
-
             <div class="form-group col-6">
                 <label>Descripción:</label>
                 <textarea name="description" class="form-control"></textarea>
