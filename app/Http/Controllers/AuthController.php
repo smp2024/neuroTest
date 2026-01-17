@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +19,18 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            $user = Auth::user();
+            // Obtener proyectos activos donde el usuario es responsable o integrante
+            $activeProjects = $user->projectUsers()
+                ->where('status', 'active')
+                ->get();
+
+            // Guardar en sesión
+            if ($activeProjects->count() > 0) {
+                session(['active_projects' => $activeProjects]);
+            } else {
+                session()->forget('active_projects');
+            }
             return redirect()->intended('/');
         }
         return back()->withErrors([

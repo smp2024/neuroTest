@@ -25,12 +25,24 @@ class FormQuestionController extends Controller
         $request->validate([
             'question_text' => 'required|string',
             'question_type' => 'required|in:text,number,date,select,checkbox,radio',
-            'order' => 'nullable|integer',
+            // 'order' => 'nullable|integer',
         ]);
 
-        $form->questions()->create($request->only([
-            'question_text', 'question_type', 'options', 'order'
-        ]) + ['active' => (bool)$request->input('active')]);
+        // $form->questions()->create($request->only([
+        //     'question_text', 'question_type', 'options', 'order'
+        // ]) + ['active' => (bool)$request->input('active')]);
+
+        $maxOrder = $form->questions()->max('order');
+        $newOrder = is_null($maxOrder) ? 1 : $maxOrder + 1;
+
+        $question = new FormQuestion();
+        $question->question_text = $request->input('question_text');
+        $question->question_type = 'radio';
+        $question->options = 'Nunca, Poco, Algo, Mucho';
+        $question->order = $newOrder;
+        $question->active = $request->has('active');
+        $question->form_id = $form->id;
+        $question->save();
 
         return redirect()->route('forms.questions.index', $form)->with('success', 'Pregunta creada');
     }

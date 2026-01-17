@@ -21,7 +21,7 @@
             <label>Texto de la pregunta:</label>
             <textarea name="question_text" class="form-control" required></textarea>
         </div>
-
+{{--
         <div class="form-group">
             <label>Tipo de campo:</label>
             <select name="question_type" class="form-control">
@@ -43,7 +43,7 @@
             <label>Orden:</label>
             <input type="number" name="order" min="1" class="form-control" value="1" required>
         </div>
-
+--}}
         <div class="form-group form-check">
             <input type="checkbox" name="active" class="form-check-input" checked>
             <label class="form-check-label">Activo</label>

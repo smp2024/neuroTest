@@ -25,6 +25,6 @@
         </tbody>
     </table>
 
-    <a href="{{ route('respuestas.index') }}" class="btn btn-secondary">Volver</a>
+    <a href="{{ url()->previous() }}" class="btn btn-secondary">Volver</a>
 </div>
 @endsection
